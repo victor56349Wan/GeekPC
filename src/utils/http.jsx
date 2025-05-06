@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken } from './index'
+import { history, getToken, clearToken } from './index'
 const http = axios.create({
   baseURL: 'http://geek.itheima.net/v1_0',
   timeout: 5000,
@@ -25,7 +25,13 @@ http.interceptors.response.use(
     return response
   },
   (error) => {
-    console.log('response error ', error)
+    // console.log('response error ', error)
+    console.dir(error)
+    /*     if (error.response.status === 401) {
+      // token expires
+      clearToken()
+      history.push('/login')
+    } */
     return Promise.reject(error)
   }
 )

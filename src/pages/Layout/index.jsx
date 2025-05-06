@@ -21,12 +21,24 @@ const GeekLayout = () => {
   const navigate = useNavigate()
   const { loginStore, userStore } = useStore()
   useEffect(() => {
-    const userInfo = userStore.getUserInfo()
-    if (!userInfo) {
-      console.log('没有用户信息')
+    const fetchUserInfo = async () => {
+      console.log('starting to fetch user info')
+      try {
+        const userInfo = await userStore.getUserInfo()
+        if (!userStore.userInfo.name) {
+          console.log('没有用户信息', userInfo)
+        }
+        console.log('useInfo name', userStore.userInfo.name)
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          console.log('token过期了')
+          loginStore.logout()
+          navigate('/login')
+        }
+      }
     }
-    console.log('useInfo name', userStore.userInfo.name)
-  }, [userStore])
+    fetchUserInfo()
+  }, [])
 
   return (
     <Layout>

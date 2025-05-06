@@ -6,10 +6,11 @@ import Article from './pages/Article'
 import Publish from './pages/Publish'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
+import { history, HistoryRouter } from './utils/history'
 import './App.css'
 const App = () => {
   return (
-    <BrowserRouter>
+    <HistoryRouter history={history}>
       <div className="App">
         <Routes>
           <Route
@@ -28,7 +29,7 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-    </BrowserRouter>
+    </HistoryRouter>
   )
 }
 export default App
