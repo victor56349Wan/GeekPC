@@ -1,9 +1,9 @@
-import { Card, Form, Input, Checkbox, Button } from 'antd'
+import { Card, Form, Input, Checkbox, Button, message } from 'antd'
 import logo from '../../assets/logo192.png'
 import './index.scss'
 import { useStore } from '../../store'
 import { useNavigate } from 'react-router-dom'
-
+window.message = message
 const Login = () => {
   const navigate = useNavigate()
   const { loginStore } = useStore()
@@ -12,10 +12,11 @@ const Login = () => {
     const { code, mobile } = value
     try {
       await loginStore.login({ mobile, code })
+      message.success('登录成功,欢迎您')
       navigate('/')
     } catch (e) {
       console.log('登录失败', e)
-      //message.error('login failed')
+      message.error(e.response?.data?.message || '登录失败，请稍后重试')
     }
   }
   return (
@@ -66,7 +67,6 @@ const Login = () => {
           </Form.Item>
         </Form>
       </Card>
-      <div>this is Login</div>
     </div>
   )
 }

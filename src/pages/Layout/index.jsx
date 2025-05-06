@@ -1,5 +1,6 @@
 import { Layout, Menu, Popconfirm } from 'antd'
 import { useEffect } from 'react'
+import '@ant-design/v5-patch-for-react-19'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store'
 import { useNavigate } from 'react-router-dom'
