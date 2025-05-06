@@ -11,8 +11,17 @@ class LoginStore {
       code,
     })
     console.log('login res', res)
+    //TODO: need to check if the response is successful
     this.token = res.data.data.token
     setToken(this.token)
+  }
+  logout = () => {
+    console.log('logout')
+    this.token = ''
+    clearToken()
+  }
+  cancel = () => {
+    console.log('cancel')
   }
 }
 export default LoginStore

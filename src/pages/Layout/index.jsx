@@ -1,5 +1,8 @@
 import { Layout, Menu, Popconfirm } from 'antd'
-
+import { useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../../store'
+import { useNavigate } from 'react-router-dom'
 import {
   HomeOutlined,
   DiffOutlined,
@@ -14,15 +17,34 @@ const { Header, Sider } = Layout
 const GeekLayout = () => {
   const location = useLocation()
   console.log(location)
+  const navigate = useNavigate()
+  const { loginStore, userStore } = useStore()
+  useEffect(() => {
+    const userInfo = userStore.getUserInfo()
+    if (!userInfo) {
+      console.log('没有用户信息')
+    }
+    console.log('useInfo name', userStore.userInfo.name)
+  }, [userStore])
 
   return (
     <Layout>
       <Header className="header">
         <div className="logo" />
         <div className="user-info">
-          <span className="user-name">user.name</span>
+          <span className="user-name">{userStore.userInfo.name}</span>
           <span className="user-logout">
-            <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消">
+            <Popconfirm
+              title="是否确认退出？"
+              okText="退出"
+              cancelText="取消"
+              onConfirm={() => {
+                loginStore.logout()
+                navigate('/login')
+              }}
+              onCancel={() => {
+                loginStore.cancel()
+              }}>
               <LogoutOutlined /> 退出
             </Popconfirm>
           </span>
@@ -57,4 +79,4 @@ const GeekLayout = () => {
   )
 }
 
-export default GeekLayout
+export default observer(GeekLayout)
