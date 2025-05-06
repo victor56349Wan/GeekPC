@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import GeekLayout from './pages/Layout'
+import { AuthRoute } from './components/AuthRoute'
 import Home from './pages/Home'
 import Article from './pages/Article'
 import Publish from './pages/Publish'
@@ -11,7 +12,13 @@ const App = () => {
     <BrowserRouter>
       <div className="App">
         <Routes>
-          <Route path="/" element={<GeekLayout />}>
+          <Route
+            path="/"
+            element={
+              <AuthRoute>
+                <GeekLayout />
+              </AuthRoute>
+            }>
             {/* <Route index element={<Home />} /> */}
             <Route index element={<Home />} />
             <Route path="article" element={<Article />} />

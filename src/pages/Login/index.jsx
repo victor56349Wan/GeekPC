@@ -15,7 +15,7 @@ const Login = () => {
       navigate('/')
     } catch (e) {
       console.log('登录失败', e)
-      message.error('login failed')
+      //message.error('login failed')
     }
   }
   return (
