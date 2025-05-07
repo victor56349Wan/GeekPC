@@ -31,15 +31,31 @@ const GeekLayout = () => {
         console.log('useInfo name', userStore.userInfo.name)
       } catch (error) {
         if (error.response && error.response.status === 401) {
-          console.log('token过期了')
           loginStore.logout()
           navigate('/login')
+          message.warning('登录过期，请重新登录')
         }
       }
     }
     fetchUserInfo()
   }, [])
-
+  const menuItems = [
+    {
+      key: '/',
+      icon: <HomeOutlined />,
+      label: <Link to="/">数据概览</Link>,
+    },
+    {
+      key: '/article',
+      icon: <DiffOutlined />,
+      label: <Link to="/article">内容管理</Link>,
+    },
+    {
+      key: '/publish',
+      icon: <EditOutlined />,
+      label: <Link to="/publish">发布文章</Link>,
+    },
+  ]
   return (
     <Layout>
       <Header className="header">
@@ -69,17 +85,9 @@ const GeekLayout = () => {
             mode="inline"
             theme="dark"
             defaultSelectedKeys={[location.pathname]}
-            style={{ height: '100%', borderRight: 0 }}>
-            <Menu.Item icon={<HomeOutlined />} key="/">
-              <Link to="/">数据概览</Link>
-            </Menu.Item>
-            <Menu.Item icon={<DiffOutlined />} key="/article">
-              <Link to="/article">内容管理</Link>
-            </Menu.Item>
-            <Menu.Item icon={<EditOutlined />} key="/publish">
-              <Link to="/publish">发布文章</Link>
-            </Menu.Item>
-          </Menu>
+            style={{ height: '100%', borderRight: 0 }}
+            items={menuItems} // 使用 items 属性
+          />
         </Sider>
         <Layout className="layout-content" style={{ padding: 20 }}>
           {/* <Link to="/home">home</Link>
