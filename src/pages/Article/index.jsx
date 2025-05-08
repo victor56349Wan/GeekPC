@@ -8,23 +8,17 @@ import { http } from '../../utils/http'
 import { useEffect, useState } from 'react'
 import img404 from '../../assets/logo192.png'
 import { useNavigate } from 'react-router-dom'
+import { useStore } from '../../store'
+import { observer } from 'mobx-react-lite'
 
 const { Option } = Select
 const { RangePicker } = DatePicker
 
 const Article = () => {
-  const [channelList, setChannelList] = useState([])
-
+  // to fetch channel list
+  const { channelListStore } = useStore()
   useEffect(() => {
-    const loadChannelList = async () => {
-      const res = await http.get('/channels')
-      console.log('loadChannelList res', res)
-      if (res.status === 200) {
-        const { channels } = res.data.data
-        setChannelList(channels)
-      }
-    }
-    loadChannelList()
+    channelListStore.loadChannelList()
   }, [])
 
   // 文章列表, 统一管理数据
@@ -75,8 +69,7 @@ const Article = () => {
     console.log('editArticle', id)
     // 跳转到编辑页面
     //window.location.href = `/article/edit/${id}`
-    //navigate(`/publish/${id}`)
-    navigate(`/publish`)
+    navigate(`/publish?id=${id}`)
   }
   const deleteArticle = async (id) => {
     console.log('deleteArticle', id)
@@ -206,7 +199,7 @@ const Article = () => {
               placeholder="请选择文章频道"
               /* defaultValue="lucy" */
               style={{ width: 120 }}>
-              {channelList.map((channel) => {
+              {channelListStore.channelList.map((channel) => {
                 return (
                   <Option key={channel.id} value={channel.id}>
                     {channel.name}
@@ -245,4 +238,4 @@ const Article = () => {
   )
 }
 
-export default Article
+export default observer(Article)

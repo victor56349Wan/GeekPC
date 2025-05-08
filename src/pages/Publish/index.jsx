@@ -10,27 +10,136 @@ import {
   Select,
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, useRef } from 'react'
+import { useStore } from '../../store'
+import { observer } from 'mobx-react-lite'
 import './index.scss'
-
+import ReactQuill from 'react-quill-new'
+import 'react-quill/dist/quill.snow.css' // Import styles
+import { http } from '../../utils/http'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 const { Option } = Select
 
 const Publish = () => {
+  const [form] = Form.useForm() // 创建表单实例
+  const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const articleId = params.get('id')
+
+  useEffect(() => {
+    async function getArticle() {
+      const res = await http.get(`/mp/articles/${articleId}`)
+      console.log('get article res', res)
+      if (res.status === 200) {
+        const { cover, ...formValue } = res.data.data
+        console.log('formValue', formValue)
+        console.log('cover', cover)
+        // 动态设置表单数据
+        form.setFieldsValue({ ...formValue, type: cover.type })
+        // 设置封面图片列表
+        const imageList = cover.images.map((url) => ({ url }))
+        setFileList(imageList)
+        // 缓存封面图片列表
+        fileListCache.current = imageList
+        setCoverType(cover.type)
+      }
+    }
+    if (articleId) {
+      // 拉取数据回显
+      getArticle()
+    }
+  }, [articleId])
+  // 使用 useStore 获取 channelListStore
+  const { channelListStore } = useStore()
+
+  useEffect(() => {
+    channelListStore.loadChannelList()
+  }, [])
+
+  const [fileList, setFileList] = useState([])
+  const [coverType, setCoverType] = useState(1)
+  const fileListCache = useRef([]) // 使用 useRef 存储缓存
+
+  // 回调处理发布文章
+  const onFinish = async (values) => {
+    console.log('onFinish', values)
+    const { type } = values
+    const params = {
+      ...values,
+      cover: {
+        type: type,
+        images: fileList.map((item) => item.url),
+      },
+    }
+    let res = null
+    if (articleId) {
+      // 编辑
+      res = await http.put(`/mp/articles/${articleId}?draft=false`, params)
+    } else {
+      // 新增
+      res = await http.post('/mp/articles?draft=false', params)
+    }
+    if (res.status === 200) {
+      console.log('publish success')
+      navigate('/article')
+    }
+  }
+
+  // 上传成功回调
+  const onUploadChange = (info) => {
+    console.log('info', info)
+    const updatedFileList = info.fileList.map((file) => {
+      if (file.response) {
+        return {
+          url: file.response.data.url,
+        }
+      }
+      console.log('file', file)
+      return file
+    })
+    setFileList(updatedFileList)
+
+    // 更新缓存的 fileListCache
+    fileListCache.current = updatedFileList
+    console.log('fileListCache', fileListCache.current)
+  }
+  const onCoverTypeChange = (e) => {
+    console.log('radio group change', e)
+    setCoverType(e.target.value)
+
+    /*     
+    if (e.target.value === 0) {
+      setFileList([]) // 无图时清空 fileList
+    } else {
+      setFileList(fileListCache.current[e.target.value] || []) // 恢复缓存的文件列表
+    } */
+  }
+  // 根据选中的coverType来动态设置Upload组件上渲染的文件列表fileList
+  // 这里的 fileListCache.current 是一个数组，存储了所有上传的文件
+
+  // 根据选中的类型来动态调整 fileList
+  useEffect(() => {
+    setFileList(fileListCache.current.slice(0, coverType))
+  }, [coverType, fileListCache.current])
+
   return (
     <div className="publish">
       <Card
         title={
-          <Breadcrumb separator=">">
-            <Breadcrumb.Item>
-              <Link to="/home">首页</Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>发布文章</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            separator=">"
+            items={[
+              { title: <a href="/">首页</a> },
+              { title: articleId ? '修改文章' : '发布文章' },
+            ]}
+          />
         }>
         <Form
+          form={form} // !!!使用 form 实例
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 16 }}
-          initialValues={{ type: 1 }}>
+          initialValues={{ type: coverType, content: '' }}
+          onFinish={(values) => onFinish(values)}>
           <Form.Item
             label="标题"
             name="title"
@@ -42,33 +151,52 @@ const Publish = () => {
             name="channel_id"
             rules={[{ required: true, message: '请选择文章频道' }]}>
             <Select placeholder="请选择文章频道" style={{ width: 400 }}>
-              <Option value={0}>推荐</Option>
+              {channelListStore.channelList.map((channel) => (
+                <Option key={channel.id} value={channel.id}>
+                  {channel.name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
           <Form.Item label="封面">
             <Form.Item name="type">
-              <Radio.Group>
-                <Radio value={1}>单图</Radio>
-                <Radio value={3}>三图</Radio>
-                <Radio value={0}>无图</Radio>
-              </Radio.Group>
+              <Radio.Group
+                options={[
+                  { value: 1, label: '单图' },
+                  { value: 3, label: '三图' },
+                  { value: 0, label: '无图' },
+                ]}
+                onChange={onCoverTypeChange}
+              />
             </Form.Item>
-            <Upload
-              name="image"
-              listType="picture-card"
-              className="avatar-uploader"
-              showUploadList>
-              <div style={{ marginTop: 8 }}>
-                <PlusOutlined />
-              </div>
-            </Upload>
+            {coverType > 0 && (
+              <Upload
+                name="image"
+                listType="picture-card"
+                className="avatar-uploader"
+                action="http://geek.itheima.net/v1_0/upload"
+                maxCount={coverType}
+                multiple={coverType > 1}
+                fileList={fileList}
+                showUploadList
+                onChange={onUploadChange}>
+                {coverType !== 0 && fileList.length < coverType && (
+                  <div style={{ marginTop: 8 }}>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>Upload</div>
+                  </div>
+                )}
+              </Upload>
+            )}
           </Form.Item>
+
           <Form.Item
             label="内容"
             name="content"
-            rules={[{ required: true, message: '请输入文章内容' }]}></Form.Item>
-
+            rules={[{ required: true, message: '请输入文章内容' }]}>
+            <ReactQuill theme="snow" placeholder="请输入文章内容" />
+          </Form.Item>
           <Form.Item wrapperCol={{ offset: 4 }}>
             <Space>
               <Button size="large" type="primary" htmlType="submit">
@@ -82,4 +210,4 @@ const Publish = () => {
   )
 }
 
-export default Publish
+export default observer(Publish)
