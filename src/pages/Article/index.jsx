@@ -35,22 +35,25 @@ const Article = () => {
   /* 异步请求需要依赖一些数据变化而重新执行, 推荐写到useEffect内部 */
   useEffect(() => {
     const loadArticleList = async () => {
-      console.log('loadArticleList params', params)
+      //console.log('loadArticleList params', params)
       const res = await http.get('/mp/articles', { params })
-      console.log('loadArticleList res', res)
-      if (res.status === 200) {
+      if (res && res.status == 200 && res.data.data) {
         const { total_count, results } = res.data.data
         setArticleData({
           list: results,
           total: total_count,
+        })
+      } else {
+        console.log('Unexpected response structure:', res)
+        setArticleData({
+          list: [],
+          total: 0,
         })
       }
     }
     loadArticleList()
   }, [params])
   const renderStatus = (status) => {
-    console.log('renderStatus', status)
-    console.log('type of status', typeof status)
     switch (status) {
       case 0:
         return <Tag color="red">草稿</Tag>
@@ -66,17 +69,17 @@ const Article = () => {
   }
   const navigate = useNavigate()
   const editArticle = async (id) => {
-    console.log('editArticle', id)
+    //console.log('editArticle', id)
     // 跳转到编辑页面
     //window.location.href = `/article/edit/${id}`
     navigate(`/publish?id=${id}`)
   }
   const deleteArticle = async (id) => {
-    console.log('deleteArticle', id)
+    //console.log('deleteArticle', id)
     // 删除文章
     //window.location.href = `/article/delete/${id}`
     await http.delete(`/mp/articles/${id}`)
-
+    // 删除成功后以原来的参数重新请求数据
     setParams({ ...params })
   }
   const columns = [
@@ -144,7 +147,7 @@ const Article = () => {
     },
   ]
   const onFormFinish = (value) => {
-    console.log('onFinish', value)
+    //console.log('onFinish', value)
     const { status, channel_id, date } = value
     const _params = {}
     if (status !== -1) {
@@ -160,7 +163,7 @@ const Article = () => {
     setParams({ ...params, ..._params })
   }
   const pageChange = (page, pageSize) => {
-    console.log('pageChange', page, pageSize)
+    //console.log('pageChange', page, pageSize)
     // 拿到当前页参数 修改params 引起接口更新
     setParams({
       ...params,

@@ -7,7 +7,7 @@ class UserStore {
   }
   async getUserInfo() {
     const res = await http.get('/user/profile')
-    console.log('userinfo res name', res.data.data.name)
+    //console.log('userinfo res name', res.data.data.name)
     /**
      *userStore.jsx?t=1746499438290:11 [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: UserStore@2.userInfo 
 

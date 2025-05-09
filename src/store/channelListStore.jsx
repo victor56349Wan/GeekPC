@@ -8,7 +8,7 @@ class ChannelListStore {
 
   async loadChannelList() {
     const res = await http.get('/channels')
-    console.log('loadChannelList res', res)
+    //console.log('loadChannelList res', res)
     if (res.status === 200) {
       runInAction(() => {
         const { channels } = res.data.data

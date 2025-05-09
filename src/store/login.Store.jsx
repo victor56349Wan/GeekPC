@@ -10,13 +10,13 @@ class LoginStore {
       mobile,
       code,
     })
-    console.log('login res', res)
+    //console.log('login res', res)
     //TODO: need to check if the response is successful
     this.token = res.data.data.token
     setToken(this.token)
   }
   logout = () => {
-    console.log('logout')
+    //console.log('logout')
     this.token = ''
     clearToken()
   }

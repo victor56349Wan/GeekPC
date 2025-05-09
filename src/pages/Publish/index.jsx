@@ -29,11 +29,11 @@ const Publish = () => {
   useEffect(() => {
     async function getArticle() {
       const res = await http.get(`/mp/articles/${articleId}`)
-      console.log('get article res', res)
+      //console.log.log('get article res', res)
       if (res.status === 200) {
         const { cover, ...formValue } = res.data.data
-        console.log('formValue', formValue)
-        console.log('cover', cover)
+        //console.log.log('formValue', formValue)
+        //console.log.log('cover', cover)
         // 动态设置表单数据
         form.setFieldsValue({ ...formValue, type: cover.type })
         // 设置封面图片列表
@@ -62,7 +62,7 @@ const Publish = () => {
 
   // 回调处理发布文章
   const onFinish = async (values) => {
-    console.log('onFinish', values)
+    //console.log.log('onFinish', values)
     const { type } = values
     const params = {
       ...values,
@@ -80,31 +80,31 @@ const Publish = () => {
       res = await http.post('/mp/articles?draft=false', params)
     }
     if (res.status === 200) {
-      console.log('publish success')
+      //console.log.log('publish success')
       navigate('/article')
     }
   }
 
   // 上传成功回调
   const onUploadChange = (info) => {
-    console.log('info', info)
+    //console.log.log('info', info)
     const updatedFileList = info.fileList.map((file) => {
       if (file.response) {
         return {
           url: file.response.data.url,
         }
       }
-      console.log('file', file)
+      //console.log.log('file', file)
       return file
     })
     setFileList(updatedFileList)
 
     // 更新缓存的 fileListCache
     fileListCache.current = updatedFileList
-    console.log('fileListCache', fileListCache.current)
+    //console.log.log('fileListCache', fileListCache.current)
   }
   const onCoverTypeChange = (e) => {
-    console.log('radio group change', e)
+    //console.log.log('radio group change', e)
     setCoverType(e.target.value)
 
     /*     

@@ -17,23 +17,21 @@ const { Header, Sider } = Layout
 
 const GeekLayout = () => {
   const location = useLocation()
-  console.log(location)
+  //console.log(location)
   const navigate = useNavigate()
   const { loginStore, userStore } = useStore()
   useEffect(() => {
     const fetchUserInfo = async () => {
-      console.log('starting to fetch user info')
+      //console.log('starting to fetch user info')
       try {
         const userInfo = await userStore.getUserInfo()
         if (!userStore.userInfo.name) {
-          console.log('没有用户信息', userInfo)
+          message.warning('未能获取到用户信息')
         }
-        console.log('useInfo name', userStore.userInfo.name)
+        //console.log('useInfo name', userStore.userInfo.name)
       } catch (error) {
         if (error.response && error.response.status === 401) {
-          loginStore.logout()
-          navigate('/login')
-          message.warning('登录过期，请重新登录')
+          console.log('登录过期，已经在http库里处理过,无需理会')
         }
       }
     }
@@ -84,7 +82,7 @@ const GeekLayout = () => {
           <Menu
             mode="inline"
             theme="dark"
-            defaultSelectedKeys={[location.pathname]}
+            selectedKeys={[location.pathname]}
             style={{ height: '100%', borderRight: 0 }}
             items={menuItems} // 使用 items 属性
           />

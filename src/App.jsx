@@ -10,7 +10,11 @@ import { history, HistoryRouter } from './utils/history'
 import './App.css'
 const App = () => {
   return (
-    <BrowserRouter>
+    <HistoryRouter
+      history={history}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      {/* <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}> */}
       <div className="App">
         <Routes>
           <Route
@@ -29,7 +33,7 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-    </BrowserRouter>
+    </HistoryRouter>
   )
 }
 export default App

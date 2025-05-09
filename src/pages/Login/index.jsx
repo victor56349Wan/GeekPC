@@ -8,14 +8,14 @@ const Login = () => {
   const navigate = useNavigate()
   const { loginStore } = useStore()
   const handleFinish = async (value) => {
-    console.log('onFinish', value)
+    //console.log('onFinish', value)
     const { code, mobile } = value
     try {
       await loginStore.login({ mobile, code })
       message.success('登录成功,欢迎您')
       navigate('/')
     } catch (e) {
-      console.log('登录失败', e)
+      //console.log('登录失败', e)
       message.error(e.response?.data?.message || '登录失败，请稍后重试')
     }
   }
