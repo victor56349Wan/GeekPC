@@ -51,6 +51,7 @@ const Article = () => {
         })
       }
     }
+    // load article list in useEffect once dependency changes
     loadArticleList()
   }, [params])
   const renderStatus = (status) => {
