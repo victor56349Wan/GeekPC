@@ -15,7 +15,7 @@ import { useStore } from '../../store'
 import { observer } from 'mobx-react-lite'
 import './index.scss'
 import ReactQuill from 'react-quill-new'
-import 'react-quill/dist/quill.snow.css' // Import styles
+import 'react-quill-new/dist/quill.snow.css' // Import styles
 import { http } from '../../utils/http'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 const { Option } = Select
